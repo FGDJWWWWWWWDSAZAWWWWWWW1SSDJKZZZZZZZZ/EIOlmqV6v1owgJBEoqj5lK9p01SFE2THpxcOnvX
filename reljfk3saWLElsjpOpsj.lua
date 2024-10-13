@@ -3658,7 +3658,7 @@ if Cultuware["Options"]["Internal"].Enabled then
         task.wait(1)
         local fps = string.format('%.0f', game.Stats.Workspace.Heartbeat:GetValue())
         local ping = string.format('%.0f', game.Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-        Library:SetWatermark('<font color=\"#d17bff\">Cultuware.cc </font> - FPS: ' .. fps .. ' - Ping: ' .. ping .. '- <font color=\"#d17bff\">[ V 2.8 ] </font>')
+        Library:SetWatermark('<font color=\"#d17bff\">Cultuware.cc </font> - FPS: ' .. fps .. ' - Ping: ' .. ping .. '- <font color=\"#d17bff\">[ V3 ] </font>')
         Library:SetWatermarkVisibility(true)
         end
         Library:SetWatermarkVisibility(false)
@@ -3697,7 +3697,7 @@ if Cultuware["Options"]["Internal"].Enabled then
         LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Added Hit Detection')
         LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Player Clone')
         LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Dupe (Still in beta)')
-        
+
         if game:GetService("UserInputService").TouchEnabled then 
             task.spawn(function()
                 local CultuwareMobileButton = Instance.new("ScreenGui")
