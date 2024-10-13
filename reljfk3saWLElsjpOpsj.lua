@@ -32,7 +32,7 @@ getgenv().Cultuware = {
         ["Intro"] = true,
         ["Stats"] = false, 
         ["Auto Join Discord"] = false, 
-        ["Allow Notifications"] = false,
+        ["Allow Notifications"] = true,
         ["Notifcation Type"] = "xaxa",
         ["Notifcation Duration"] = 3,
     },
@@ -177,7 +177,7 @@ getgenv().Cultuware = {
     },
     ["Hit Sound"] = {
         ["Enabled"] = false,
-        ["Hit Sound"] = "Minecraft",
+        ["Hit Sound"] = "Neverlose",
         ["Volume"] = 1,
     },
     ["Hit Logs"] = {
@@ -682,7 +682,6 @@ local notifications = notificationLibrary.new({
 
 notifications:BuildNotificationUI();
 
-
 getgenv().notify = function(txt) 
     if Cultuware.Options["Allow Notifications"] then
         if string.lower(Cultuware.Options["Notifcation Type"]) == "akali" then 
@@ -855,8 +854,8 @@ if Cultuware["Options"]["Intro"] then
     Image.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Image.BackgroundTransparency = 1
     Image.Position = UDim2.new(0, newx, 0, newy)
-    Image.Size = UDim2.new(0, 300, 0, 300)
-    Image.Image = "rbxassetid://107908073227931"
+    Image.Size = UDim2.new(0.6, 0, 0.6, 0)
+    Image.Image = "rbxassetid://130000271915107"
     Image.ImageTransparency = 1
     Image.AnchorPoint = Vector2.new(0.5,0.5)
 
@@ -2732,9 +2731,9 @@ if Cultuware["Options"]["Internal"].Enabled then
         getgenv().Cultuware_UI_LOADED = true
         local HitpartTable = {"Head", "HumanoidRootPart", "Left Arm", "Right Arm", "Right Leg", "Left Leg"}
         
-        local Build = "[ V 2.7 ]";local Color = "#d17bff";local Ver = "[ V 2.7 ]"
-        if Build == "[ V 2.7 ]" then Color = '#d17bff' Ver = "[ V 2.7 ]" end
-        local Window = Library:CreateWindow({ Size = UDim2.fromOffset(550, 610),Title = "<font color=\"#d17bff\">[ Chaos ] </font>                                   Cultuware.<font color=\"#d17bff\">cc</font>                                                  ".."<font color=\""..Color.."\">"..Build.."</font>".."",Center = true,AutoShow = true})
+        local Build = "[ V3 ]";local Color = "#d17bff";local Ver = "[ V3 ]"
+        if Build == "[ V3 ]" then Color = '#d17bff' Ver = "[ V3 ]" end
+        local Window = Library:CreateWindow({ Size = UDim2.fromOffset(550, 610),Title = "<font color=\"#d17bff\">[ Chaos ] </font>              Cultuware.<font color=\"#d17bff\">cc</font>              ".."<font color=\""..Color.."\">"..Build.."</font>".."",Center = true,AutoShow = true})
         local Tabs = {MainTab = Window:AddTab('Main'), VisualTab = Window:AddTab('Visual'), ExtraTab = Window:AddTab('Extra'), SettingsTab = Window:AddTab('Settings')}
 
         --- Cam-Lock
@@ -2757,6 +2756,10 @@ if Cultuware["Options"]["Internal"].Enabled then
 
         CamLockTab:AddToggle('DotToggle', {Text = 'Dot', Default = Cultuware["Cam Lock"]["Dot"] }):OnChanged(function(Value)
             Cultuware["Cam Lock"]["Dot"] = Value
+        end)
+
+        CamLockTab:AddToggle('NotifiToggle', {Text = 'Notifications', Default = Cultuware["Cam Lock"].Notify }):OnChanged(function(Value)
+            Cultuware["Cam Lock"].Notify = Value
         end)
 
         CamLockTab:AddSlider('FovSize', {Text = 'Fov Size', Suffix = "%", Default = Cultuware["FOV"]["Cam Lock"].Size, Min = 1, Max = 100, Rounding = 0, Compact = true}):OnChanged(function(Value)
@@ -2973,14 +2976,6 @@ if Cultuware["Options"]["Internal"].Enabled then
             loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
         end)
 
-        MiscTab:AddButton('Rejoin', function()
-            local ts = game:GetService("TeleportService")
-            local p = game:GetService("Players").LocalPlayer
-            
-            
-            ts:Teleport(game.PlaceId, p)
-        end)
-
         --- CFrame Speed
 
         local CFrameSpeedTabBox = Tabs.MainTab:AddLeftTabbox()
@@ -2992,6 +2987,17 @@ if Cultuware["Options"]["Internal"].Enabled then
 
         CFrameSpeedTab:AddSlider('CFrameSpeed', {Text = 'CFrame Speed', Suffix = "%", Default = tpWalkSpeed, Min = 1, Max = 500, Rounding = 1, Compact = true}):OnChanged(function(Value)
             tpWalkSpeed = Value
+        end)
+
+        --- SpinBot
+        local SpinBotTab = CFrameSpeedTabBox:AddTab('Spin-Bot')
+
+        SpinBotTab:AddToggle('SpinToggle',{Text='Enable',Default= false }):AddKeyPicker('SpinKey', {Default='Non',SyncToggleState=true,Mode='Toggle',Text='Spin-Bot',NoUI=false}):OnChanged(function(Value)
+            getgenv().spinbotEnabled = Value
+        end)
+
+        SpinBotTab:AddSlider('SpinSpeed', {Text = 'Spin Speed', Suffix = "%", Default = spinBotSpeed, Min = 1, Max = 500, Rounding = 1, Compact = true}):OnChanged(function(Value)
+            spinBotSpeed = Value
         end)
 
         --- Auto Select
@@ -3039,17 +3045,25 @@ if Cultuware["Options"]["Internal"].Enabled then
             end)
         end)
 
-        --- SpinBot
+        --- Hit Detection
 
-        local SpinBotTabBox = Tabs.MainTab:AddRightTabbox()
-        local SpinBotTab = SpinBotTabBox:AddTab('Spin-Bot')
+        local HitDetectionTabBox = Tabs.MainTab:AddRightTabbox()
+        local HitDetectionTab = HitDetectionTabBox:AddTab('Hit Detection')
 
-        SpinBotTab:AddToggle('SpinToggle',{Text='Enable',Default= false }):AddKeyPicker('SpinKey', {Default='Non',SyncToggleState=true,Mode='Toggle',Text='Spin-Bot',NoUI=false}):OnChanged(function(Value)
-            getgenv().spinbotEnabled = Value
+        HitDetectionTab:AddToggle('HitDetectionEnable', {Text = 'Enable', Default = false}):OnChanged(function(Value)
+            Cultuware["Hit Sound"].Enabled = Value
         end)
 
-        SpinBotTab:AddSlider('SpinSpeed', {Text = 'Spin Speed', Suffix = "%", Default = spinBotSpeed, Min = 1, Max = 500, Rounding = 1, Compact = true}):OnChanged(function(Value)
-            spinBotSpeed = Value
+        HitDetectionTab:AddDropdown('HitDetectionSound', {Values = hitSoundsNames ,Default = Cultuware["Hit Sound"]["Hit Sound"] ,Multi = false,Text = 'Select A Sound'}):OnChanged(function(Value)
+            Cultuware["Hit Sound"]["Hit Sound"] = Value
+        end)
+    
+        HitDetectionTab:AddSlider('HitDetectionVolume', {Text = 'Volume', Suffix = "%", Default = Cultuware["Hit Sound"].Volume, Min = 1, Max = 100, Rounding = 1, Compact = false}):OnChanged(function(Value)
+            Cultuware["Hit Sound"].Volume = Value
+        end)
+
+        HitDetectionTab:AddToggle('HitDetectionEnable', {Text = 'Hit Logs', Default = Cultuware["Hit Logs"].Enabled}):OnChanged(function(Value)
+            Cultuware["Hit Logs"].Enabled = Value
         end)
 
         --- Skybox
@@ -3065,6 +3079,14 @@ if Cultuware["Options"]["Internal"].Enabled then
                 ["SkyboxLf"] = "rbxassetid://159454286",
                 ["SkyboxRt"] = "rbxassetid://159454300",
                 ["SkyboxUp"] = "rbxassetid://159454288"
+            },
+            ["Nebula"] = {
+                ["SkyboxBk"] = "rbxassetid://6277563515",
+                ["SkyboxDn"] = "rbxassetid://6277565742",
+                ["SkyboxFt"] = "rbxassetid://6277567481",
+                ["SkyboxLf"] = "rbxassetid://6277569562",
+                ["SkyboxRt"] = "rbxassetid://6277583250",
+                ["SkyboxUp"] = "rbxassetid://6277586065"
             },
             ["Night Sky"] = {
                 ["SkyboxBk"] = "rbxassetid://12064107",
@@ -3180,11 +3202,11 @@ if Cultuware["Options"]["Internal"].Enabled then
             }
         }
 
-        SkyboxTab:AddToggle('SkyboxEnable', {Text = 'Custom Skybox', Default = false}):OnChanged(function(x)
+        SkyboxTab:AddToggle('SkyboxEnable', {Text = 'Enable', Default = false}):OnChanged(function(x)
             sky = x
         end)
 
-        SkyboxTab:AddDropdown('SkyboxDropdown', {Values = {"Purple Nebula", "Night Sky", "Pink Daylight", "Morning Glow", "Setting Sun", "Fade Blue", "Elegant Morning", "Neptune", "Aesthetic Night", "HL Last Coast", "Floppa", "Kanye West", "Purple And Blue", "Twighlight", "Faded Morning"},Default = 1,Multi = false,Text = 'Select A Skybox'}):OnChanged(function(x)
+        SkyboxTab:AddDropdown('SkyboxDropdown', {Values = {"Purple Nebula", "Nebula", "Night Sky", "Pink Daylight", "Morning Glow", "Setting Sun", "Fade Blue", "Elegant Morning", "Neptune", "Aesthetic Night", "HL Last Coast", "Floppa", "Kanye West", "Purple And Blue", "Twighlight", "Faded Morning"},Default = 1,Multi = false,Text = 'Select A Skybox'}):OnChanged(function(x)
             if not sky then return end
             if game.Lighting:FindFirstChildOfClass("Sky") then game.Lighting:FindFirstChildOfClass("Sky"):Destroy() end
             local skybox = Instance.new("Sky", game.Lighting)
@@ -3204,7 +3226,7 @@ if Cultuware["Options"]["Internal"].Enabled then
 
         local OldAmbientColor = Color3.fromRGB(138,138,138)
 
-        AmbientTab:AddLabel('Ambient Color'):AddColorPicker('Ambient_Color', { Default = OldAmbientColor})
+        AmbientTab:AddLabel('Color'):AddColorPicker('Ambient_Color', { Default = OldAmbientColor})
         Options.Ambient_Color:OnChanged(function(Ambient_Color)
             game:GetService("Lighting").Ambient = Ambient_Color
         end)
@@ -3213,33 +3235,32 @@ if Cultuware["Options"]["Internal"].Enabled then
             Options.Ambient_Color:SetValueRGB(Color3.fromRGB(138,138,138))
         end)
 
-        --- Brightness
+        --- Out-Door Ambient
 
-        local BrightnessTabBox = Tabs.VisualTab:AddLeftTabbox()
-        local BrightnessTab = BrightnessTabBox:AddTab('Brightness')
-
-        BrightnessTab:AddSlider('BrightnessValue', {Text = 'Brightness', Suffix = "%", Default = 2, Min = 0, Max = 10, Rounding = 1, Compact = false}):OnChanged(function(Value)
-            game:GetService("Lighting").Brightness = Value
-        end)
-
-        BrightnessTab:AddButton('Reset', function()
-            Options.BrightnessValue:SetValue(2)
-        end)
-
-        --- OutDoor Ambient
-
-        local OutdoorAmbientTabBox = Tabs.VisualTab:AddLeftTabbox()
-        local OutdoorAmbientTab = OutdoorAmbientTabBox:AddTab('Outdoor-Ambient')
+        local OutdoorAmbientTab = AmbientTabBox:AddTab('Outdoor')
 
         local OldOutdoorAmbientColor = Color3.fromRGB(128,128,128)
 
-        OutdoorAmbientTab:AddLabel('Outdoor Ambient Color'):AddColorPicker('Outdoor_Color', { Default = OldOutdoorAmbientColor})
+        OutdoorAmbientTab:AddLabel('Color'):AddColorPicker('Outdoor_Color', { Default = OldOutdoorAmbientColor})
         Options.Outdoor_Color:OnChanged(function(Outdoor_Color)
             game:GetService("Lighting").OutdoorAmbient = Outdoor_Color
         end)
 
         OutdoorAmbientTab:AddButton('Reset', function()
             Options.Outdoor_Color:SetValueRGB(Color3.fromRGB(128,128,128))
+        end)
+
+        --- Brightness
+
+        local BrightnessTabBox = Tabs.VisualTab:AddLeftTabbox()
+        local BrightnessTab = BrightnessTabBox:AddTab('Brightness')
+
+        BrightnessTab:AddSlider('BrightnessValue', {Text = 'Value', Suffix = "%", Default = 2, Min = 0, Max = 10, Rounding = 1, Compact = false}):OnChanged(function(Value)
+            game:GetService("Lighting").Brightness = Value
+        end)
+
+        BrightnessTab:AddButton('Reset', function()
+            Options.BrightnessValue:SetValue(2)
         end)
 
         --- Fog
@@ -3249,20 +3270,24 @@ if Cultuware["Options"]["Internal"].Enabled then
 
         local OldFogColor = Color3.fromRGB(165, 224, 255)
 
-        FogTab:AddLabel('Fog Color'):AddColorPicker('Fog_Color', { Default = OldFogColor})
+        FogTab:AddLabel('Color'):AddColorPicker('Fog_Color', { Default = OldFogColor})
         Options.Fog_Color:OnChanged(function(Fog_Color)
             game:GetService("Lighting").FogColor = Fog_Color
         end)
 
-        FogTab:AddSlider('FogEndValue', {Text = 'Fog End', Suffix = "%", Default = 4000, Min = 0, Max = 10000, Rounding = 1, Compact = false}):OnChanged(function(Value)
-            game:GetService("Lighting").FogEnd = Value
-        end)
-
-        FogTab:AddButton('Reset Fog Color', function()
+        FogTab:AddButton('Reset', function()
             Options.Fog_Color:SetValueRGB(Color3.fromRGB(165, 224, 255))
         end)
 
-        FogTab:AddButton('Reset Fog End', function()
+        --- Fog End
+
+        local FogEndTab = FogTabBox:AddTab('Fog-End')
+
+        FogEndTab:AddSlider('FogEndValue', {Text = 'Distance', Suffix = "%", Default = 4000, Min = 0, Max = 10000, Rounding = 1, Compact = false}):OnChanged(function(Value)
+            game:GetService("Lighting").FogEnd = Value
+        end)
+
+        FogEndTab:AddButton('Reset', function()
             Options.FogEndValue:SetValue(4000)
         end)
 
@@ -3279,10 +3304,10 @@ if Cultuware["Options"]["Internal"].Enabled then
             Options.TimeValue:SetValue(14)
         end)
 
-        --- Rev
+        --- Revolver
 
         local RevolverColorTabBox = Tabs.VisualTab:AddRightTabbox()
-        local RevolverTab = RevolverColorTabBox:AddTab('Revolver')
+        local RevolverTab = RevolverColorTabBox:AddTab('Revolver Bullet')
 
         local OldBulletColor = Color3.fromRGB(248, 217, 109)
 
@@ -3309,6 +3334,78 @@ if Cultuware["Options"]["Internal"].Enabled then
 
         SprintingColoRtab:AddButton('Reset', function()
             Options.Sprinting_Color:SetValueRGB(Color3.fromRGB(56, 186, 255))
+        end)
+
+        --- Player Clone
+
+        local Eclipse_Settins = {
+            miscs = {
+                clone = {
+                toggle = false,
+                timedestroy = 1,
+                matreial = "Neon",
+                color = Color3.fromRGB(255,255,255),
+                Transpancy = 0
+            },
+        }
+    }
+        local Eclipse_Folder = Instance.new("Folder", workspace)
+
+        Eclipse_Folder.Name = "x"
+        Eclipse_Folder.Parent = game.Workspace
+
+        local PlayerCloneTabBox = Tabs.VisualTab:AddRightTabbox()
+        local PlayerCloneTab = PlayerCloneTabBox:AddTab('Player Clone')
+
+        PlayerCloneTab:AddToggle('CloneEnable', {Text = 'Enable', Default = false}):OnChanged(function(x)
+            Eclipse_Settins.miscs.clone.toggle = x
+            if  Eclipse_Settins.miscs.clone.toggle then
+                repeat
+                    game.Players.LocalPlayer.Character.Archivable = true
+                    local Clone = game.Players.LocalPlayer.Character:Clone()
+                    for _,clone in next, Clone:GetDescendants() do
+                        if clone.Name == "HumanoidRootPart" or clone:IsA("Humanoid") or clone:IsA("LocalScript") or clone:IsA("Script") or clone:IsA("Decal") then
+                            clone:Destroy()
+                        elseif clone:IsA("BasePart") or clone:IsA("Meshpart") or clone:IsA("Part")   then
+                            if clone.Transparency == 1 then
+                                clone:Destroy()
+                            else
+                                clone.CanCollide = false
+                                clone.Anchored = true
+                                clone.Material = Eclipse_Settins.miscs.clone.matreial
+                                clone.Color = Eclipse_Settins.miscs.clone.color
+                                clone.Transparency = Eclipse_Settins.miscs.clone.Transpancy
+                                clone.Size = clone.Size + Vector3.new(0.03, 0.03, 0.03)   
+                            end
+                        end
+                        pcall(function()
+                            clone.CanCollide = false
+                        end)
+                    end
+                    Clone.Parent = Eclipse_Folder
+                    wait(Eclipse_Settins.miscs.clone.timedestroy)
+                    Clone:Destroy()
+                until Eclipse_Settins.miscs.clone.toggle == false
+            end
+        end)
+
+        local OldCloneColor = Color3.fromRGB(255, 255, 255)
+
+        PlayerCloneTab:AddLabel('Color'):AddColorPicker('Clone_Color', { Default = OldCloneColor})
+        Options.Clone_Color:OnChanged(function(Clone_Color)
+            Eclipse_Settins.miscs.clone.color = Clone_Color
+        end)
+
+        PlayerCloneTab:AddSlider('Clone_Delay', {Text = 'Duration', Suffix = "%", Default = 0.3, Min = 0, Max = 1, Rounding = 2, Compact = false}):OnChanged(function(Value)
+            Eclipse_Settins.miscs.clone.timedestroy = Value
+        end)
+
+        PlayerCloneTab:AddSlider('Clone_Transparency', {Text = 'Transparency', Suffix = "%", Default = 0, Min = 0, Max = 1, Rounding = 2, Compact = false}):OnChanged(function(Value)
+            Eclipse_Settins.miscs.clone.Transpancy = Value
+        end)
+
+        PlayerCloneTab:AddDropdown('Clone_Dropdown', {Values = {"Neon", "Glass","ForceField"},Default = 3,Multi = false,Text = 'Material'}):OnChanged(function(x)
+            Eclipse_Settins.miscs.clone.matreial = x
         end)
 
         --- Camera
@@ -3466,6 +3563,83 @@ if Cultuware["Options"]["Internal"].Enabled then
             end
         end)
 
+        --- Dupe's
+
+        local DupesTabBox = Tabs.ExtraTab:AddLeftTabbox()
+        local DupesTab = DupesTabBox:AddTab('Dupe (Beta)')
+
+        DupesTab:AddButton('Fireworks', function()
+            local jajaplayer = game.Players.LocalPlayer
+            local humanoid = jajaplayer.Character:FindFirstChild("Humanoid")
+
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-170, 63, -26)
+            wait(0.2)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            wait(0.2)
+            player.Character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(-287, 108, -48)
+            wait(0.2)
+            local Firework = jajaplayer.Backpack.Firework
+            humanoid:EquipTool(Firework)
+            humanoid.Health = 0
+            wait()
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+            wait(0.1)
+        end)
+
+        DupesTab:AddButton('Collect All Fireworks', function()
+            local root = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("HumanoidRootPart") or game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("BasePart")
+            wait(0.1)
+            local function touch(x)
+                x = x:FindFirstAncestorWhichIsA("BasePart")
+                if x and firetouchinterest then
+                    if x.Name == "Button" then
+                        return
+                    end
+                    
+                    task.spawn(function()
+                        firetouchinterest(x, root, 1)
+                        wait()
+                        firetouchinterest(x, root, 0)
+                    end)
+                    x.CFrame = root.CFrame
+                end
+            end
+            
+            for _, descendant in ipairs(workspace:GetDescendants()) do
+                if descendant:IsA("TouchTransmitter") then
+                    touch(descendant)
+                end
+            end
+        end)
+
         --- Settings
 
         local UITabBox = Tabs.SettingsTab:AddLeftTabbox()
@@ -3484,7 +3658,7 @@ if Cultuware["Options"]["Internal"].Enabled then
         task.wait(1)
         local fps = string.format('%.0f', game.Stats.Workspace.Heartbeat:GetValue())
         local ping = string.format('%.0f', game.Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-        Library:SetWatermark('<font color=\"#d17bff\">Cultuware.cc </font> - FPS: ' .. fps .. ' - Ping: ' .. ping .. '- <font color=\"#d17bff\">[ V 2.7 ] </font>')
+        Library:SetWatermark('<font color=\"#d17bff\">Cultuware.cc </font> - FPS: ' .. fps .. ' - Ping: ' .. ping .. '- <font color=\"#d17bff\">[ V 2.8 ] </font>')
         Library:SetWatermarkVisibility(true)
         end
         Library:SetWatermarkVisibility(false)
@@ -3499,18 +3673,31 @@ if Cultuware["Options"]["Internal"].Enabled then
         CreditsTab:AddLabel('Discord:<font color="#de6cff"> dxyzlv</font>')
         CreditsTab:AddLabel('Version:<font color="#de6cff"> 2.7 / Public</font> ')
 
+        local OkTabBox = Tabs.SettingsTab:AddRightTabbox()
+        local OkTab = OkTabBox:AddTab('Extra')
+
+        OkTab:AddButton('Rejoin', function()
+            local ts = game:GetService("TeleportService")
+            local p = game:GetService("Players").LocalPlayer
+            
+            ts:Teleport(game.PlaceId, p)
+        end)
+
+        OkTab:AddButton('Close Game', function()
+            game:Shutdown()
+        end)
+
         --- Changes
 
         local LogsTabBox = Tabs.SettingsTab:AddLeftTabbox()
         local LogsTab = LogsTabBox:AddTab('Changes')
 
-        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added More Skybox')
-        LogsTab:AddLabel('<font color="#00FF00">[+]</font> New Library')
-        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Fixed CFrame Walk')
-        LogsTab:AddLabel('<font color="#00FF00">[+]</font> New Intro')
-        LogsTab:AddLabel('<font color="#FF0000">[-]</font> Removed Loop (Im Re-Working It)')
-        LogsTab:AddLabel('<font color="#FF0000">[-]</font> Removed Esp (Im Re-Working It)')
-
+        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added One More Skybox (Nebula)')
+        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Notification For Cam-Locl')
+        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Added Hit Detection')
+        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Player Clone')
+        LogsTab:AddLabel('<font color="#00FF00">[+]</font> Added Dupe (Still in beta)')
+        
         if game:GetService("UserInputService").TouchEnabled then 
             task.spawn(function()
                 local CultuwareMobileButton = Instance.new("ScreenGui")
